@@ -15,5 +15,6 @@ __pycache__/
 .github/
 
 # 忽略 Docker 配置文件
+Docker/
 Dockerfile
 docker-compose.yml

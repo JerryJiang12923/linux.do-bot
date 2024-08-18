@@ -31,12 +31,18 @@
 - assets/
   - wxPusher.png
   - wxPusherMsg.png
+- config/
+  - config.ini
+  - reply.txt
+  - reply_generator.py
+- Docker/
+  - linux-do-bot.tar
+- .dockerignore
 - .gitignore
+- Dockerfile
 - LICENSE
-- README.md
-- config.ini
 - main.py
-- reply.txt
+- README.md
 ```
 
 ## 环境依赖
@@ -74,7 +80,7 @@ playwright install
 
 ### 1.2 配置文件
 
-在项目根目录下创建 `config.ini` 文件，内容如下：
+在项目根目录下config目录下创建 `config.ini` 文件，内容如下：
 
 ```ini
 [credentials]
@@ -118,7 +124,7 @@ playwright install
 
 ### 2.2 配置文件
 
-在服务器main.py的同级目录 `./` 目录下创建 `config.ini` 文件：
+在服务器main.py的同级目录 `./config` 目录下创建 `config.ini` 文件：
 
 ```ini
 [credentials]
@@ -250,15 +256,22 @@ pip install pyinstaller
 
 你可以使用以下命令将 `main.py`、`config.ini` 和 `reply.txt` 打包成一个 `.exe` 文件：
 
+windows:
 ```bash
-pyinstaller --onefile --add-data "config.ini;." --add-data "reply.txt;." main.py
+pyinstaller --onefile --add-data "config/config.ini;config" --add-data "config/reply.txt;config" --add-data "config/reply_generator.py;config" main.py
+```
+linux:
+windows:
+```bash
+pyinstaller --onefile --add-data "config/config.ini:config" --add-data "config/reply.txt:config" --add-data "config/reply_generator.py:config" main.py
 ```
 
 ### 4.3. 说明
 
 - `--onefile`：将所有依赖打包成一个独立的 `.exe` 文件。
-- `--add-data "config.ini;."`：将 `config.ini` 文件包含在打包的 `.exe` 文件中，放置在当前目录下（`.` 表示当前目录）。
-- `--add-data "reply.txt;."`：将 `reply.txt` 文件也包含在打包的 `.exe` 文件中，放置在当前目录下。
+- `--add-data "config.ini;config"`：将 `config.ini` 文件包含在打包的 `.exe` 文件中，放置在config目录下。
+- `--add-data "reply.txt;config"`：将 `reply.txt` 文件也包含在打包的 `.exe` 文件中，放置在config当前目录下。
+- `--add-data "reply_generator.py;config"`：将 `reply_generator.py` 文件也包含在打包的 `.exe` 文件中，放置在config当前目录下。
 
 ### 4.4. 打包完成
 
@@ -308,7 +321,35 @@ OR：
 docker pull lee0692/linux-do-bot:latest
 ```
 
-### 5.2. **运行 Docker 容器**：
+### 5.2. **更新包列表并安装依赖**:
+```
+sudo apt-get update
+sudo apt-get install -y --fix-missing \
+    libgtk-3-0 \
+    libasound2 \
+    libx11-6 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxrandr2 \
+    libxrender1 \
+    libxtst6 \
+    libfreetype6 \
+    libfontconfig1 \
+    libpangocairo-1.0-0 \
+    libpango-1.0-0 \
+    libatk1.0-0 \
+    libcairo2 \
+    libgdk-pixbuf2.0-0 \
+    libglib2.0-0 \
+    libdbus-1-3 \
+    libxcb1 \
+    libxi6 && \
+    rm -rf /var/lib/apt/lists/*
+```
+
+### 5.3. **运行 Docker 容器**：
 ```
     docker run -d --name linux-do-bot-container \
       -e LINUXDO_USERNAME=your_username \
@@ -326,7 +367,7 @@ docker pull lee0692/linux-do-bot:latest
    - 替换环境变量的值以匹配你的实际配置。
    - 你可以通过编辑 `config.ini` 文件来调整配置。
 
-### 5.3. **使用 Docker Compose（可选）**
+### 5.4. **使用 Docker Compose（可选）**
 - 如果你的项目将来需要更多服务，可以使用 docker-compose.yml 文件来管理多个容器。创建一个 docker-compose.yml 文件，内容示例：
 ```
   version: '3'
@@ -351,7 +392,7 @@ services:
   docker-compose up --build
 ```
 
-### 5.4 其他说明
+### 5.5 其他说明
 
 - **配置文件**：`config.ini` 文件可以通过 Docker Volume 挂载到容器中，以便在运行时修改配置。
 - **时区设置**：默认时区设置为中国时区（Asia/Shanghai）。

@@ -11,6 +11,9 @@ from datetime import datetime
 from configparser import ConfigParser
 from tabulate import tabulate
 from playwright.sync_api import sync_playwright, TimeoutError
+from config import reply_generator
+
+# I stumbled upon this site thinking it might be a promising open-source Linux community. After exploring a bit, it seems like it's still in its early stages and doesn't quite live up to the 'community' label yet. There’s no shortage of overconfident individuals here, but it feels more like an amateurish forum rather than a serious place for Linux enthusiasts.
 
 # 创建一个 StringIO 对象用于捕获日志
 log_stream = io.StringIO()
@@ -46,11 +49,11 @@ IS_SERVER = platform.system() == "Linux" and not IS_GITHUB_ACTIONS
 def load_config():
     config = ConfigParser()
     if IS_SERVER:
-        config_file = './config.ini'
+        config_file = './config/config.ini'
     elif IS_GITHUB_ACTIONS:
         config_file = None
     else:
-        config_file = 'config.ini'
+        config_file = 'config/config.ini'
     
     if config_file and os.path.exists(config_file):
         config.read(config_file)
@@ -288,6 +291,20 @@ class LinuxDoBrowser:
             self.page.goto(CONNECT_URL)
             time.sleep(2)
             logging.info(f"当前页面URL: {self.page.url}")
+            time.sleep(2)
+            rows = self.page.query_selector_all("table tr")
+            info = []
+            for row in rows:
+                cells = row.query_selector_all("td")
+                if len(cells) >= 3:
+                    project = cells[0].text_content().strip()
+                    current = cells[1].text_content().strip()
+                    requirement = cells[2].text_content().strip()
+                    info.append([project, current, requirement])
+
+            logging.info("--------------Connect Info-----------------")
+            logging.info("\n%s", tabulate(info, headers=["项目", "当前", "要求"], tablefmt="pretty"))
+            self.page.close()
         except TimeoutError:
             logging.error("连接信息页面加载超时")
         except Exception as e:
@@ -309,11 +326,8 @@ class LinuxDoBrowser:
 
     def click_reply(self, page):
         try:
-            # 从文件加载消息
-            messages = self.load_messages('reply.txt')
-
-            # Select a random message
-            random_message = self.get_random_message(messages)
+            # 加载消息
+            random_message = reply_generator.get_random_reply()
 
             # 选择一条随机消息
             page.wait_for_selector(".reply.create.btn-icon-text", timeout=2000)

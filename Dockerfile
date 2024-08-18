@@ -9,10 +9,35 @@ COPY . .
 
 # 更换 pip 镜像源为国内镜像源，并安装 requests、tabulate 和 configparser
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple && \
-    pip install requests tabulate configparser
+    pip install --no-cache-dir requests tabulate configparser
 
-# 单独安装 playwright
-RUN pip install playwright && \
+# 安装系统库
+#RUN apt-get update && apt-get install -y --fix-missing \
+#    libgtk-3-0 \
+#    libasound2 \
+#    libx11-6 \
+#    libxcomposite1 \
+#    libxdamage1 \
+#    libxext6 \
+#    libxfixes3 \
+#    libxrandr2 \
+#    libxrender1 \
+#    libxtst6 \
+#    libfreetype6 \
+#    libfontconfig1 \
+#    libpangocairo-1.0-0 \
+#    libpango-1.0-0 \
+#    libatk1.0-0 \
+#    libcairo2 \
+#    libgdk-pixbuf2.0-0 \
+#    libglib2.0-0 \
+#    libdbus-1-3 \
+#    libxcb1 \
+#    libxi6 && \
+#    rm -rf /var/lib/apt/lists/*
+
+# 安装 playwright 并安装浏览器
+RUN pip install --no-cache-dir playwright && \
     playwright install
 
 # 设置时区为中国时区

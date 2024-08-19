@@ -196,6 +196,8 @@ class LinuxDoBrowser:
                 try:
                     page.goto(article_url)
                     time.sleep(3)  # 等待页面完全加载
+                    # 随机滚动页面
+                    self.visit_article_and_scroll(page)
                     if random.random() < LIKE_PROBABILITY:
                         self.click_like(page)
                         liked_articles.append({"title": article_title, "url": article_url})
@@ -252,6 +254,7 @@ class LinuxDoBrowser:
                 return
             self.click_topic()
             self.print_connect_info()
+            self.logout()
         except Exception as e:
             logging.error(f"运行过程中出错: {e}")
         finally:
@@ -304,7 +307,6 @@ class LinuxDoBrowser:
 
             logging.info("--------------Connect Info-----------------")
             logging.info("\n%s", tabulate(info, headers=["项目", "当前", "要求"], tablefmt="pretty"))
-            self.page.close()
         except TimeoutError:
             logging.error("连接信息页面加载超时")
         except Exception as e:
@@ -385,6 +387,69 @@ class LinuxDoBrowser:
         except Exception as e:
             logging.error(f"加入书签操作失败: {e}")
 
+    def visit_article_and_scroll(self, page):
+        try:
+            # 随机滚动页面5到10秒
+            scroll_duration = random.randint(5, 10)
+            logging.info(f"随机滚动页面 {scroll_duration} 秒...")
+            scroll_end_time = time.time() + scroll_duration
+
+            while time.time() < scroll_end_time:
+                scroll_distance = random.randint(300, 600)  # 每次滚动的距离，随机选择
+                page.mouse.wheel(0, scroll_distance)
+                time.sleep(random.uniform(0.5, 1.5))  # 随机等待0.5到1.5秒再滚动
+
+            logging.info("页面滚动完成")
+
+        except Exception as e:
+            logging.error(f"滚动页面时出错: {e}")
+
+    def logout(self):
+        try:
+            logging.info(f"导航到 {HOME_URL}...")
+            self.page.goto(HOME_URL)
+            time.sleep(2)
+
+            # 点击用户菜单按钮以显示下拉菜单
+            logging.info("尝试找到并点击用户菜单按钮...")
+            self.page.wait_for_selector("#current-user .icon", timeout=2000)
+            user_menu_button = self.page.locator("#current-user .icon").first
+            if user_menu_button:
+                user_menu_button.click()
+                logging.info("成功点击用户菜单按钮")
+            else:
+                logging.info("未找到用户菜单按钮")
+                return
+
+            time.sleep(2)  # 确保菜单展开
+
+            # 点击“个人资料”标签
+            logging.info("尝试找到并点击个人资料标签...")
+            self.page.wait_for_selector("#user-menu-button-profile", timeout=2000)
+            profile_tab_button = self.page.locator("#user-menu-button-profile").first
+            if profile_tab_button:
+                profile_tab_button.click()
+                logging.info("成功点击个人资料标签")
+            else:
+                logging.info("未找到个人资料标签")
+                return
+
+            time.sleep(2)  # 确保页面加载个人资料内容
+
+            # 定位并点击退出按钮
+            logging.info("尝试找到并点击退出按钮...")
+            self.page.wait_for_selector(".logout .btn", timeout=2000)
+            logout_button = self.page.locator(".logout .btn").first
+            if logout_button:
+                logout_button.click()
+                logging.info("成功点击退出按钮")
+            else:
+                logging.info("未找到退出按钮")
+
+        except TimeoutError:
+            logging.warning("定位按钮超时")
+        except Exception as e:
+            logging.error(f"操作失败: {e}")
 
 if __name__ == "__main__":
     ldb = LinuxDoBrowser()

@@ -169,6 +169,9 @@ class LinuxDoBrowser:
     def click_topic(self):
         try:
             logging.info("开始处理主题...")
+            # 随机滚动页面
+            self.visit_article_and_scroll(self.page)
+            # 加载主题
             topics = self.page.query_selector_all("#list-area .title")
             total_topics = len(topics)
             logging.info(f"共找到 {total_topics} 个主题。")
@@ -178,7 +181,10 @@ class LinuxDoBrowser:
                 logging.info(f"处理主题数超过最大限制 {MAX_TOPICS}，仅处理前 {MAX_TOPICS} 个主题。")
                 topics = topics[:MAX_TOPICS]
 
+            skip_articles = []
+            skip_count = 0
             browsed_articles = []
+            browsed_count = 0
             liked_articles = []
             like_count = 0
             replied_articles = []
@@ -187,15 +193,38 @@ class LinuxDoBrowser:
             collect_count = 0
 
             for idx, topic in enumerate(topics):
-                article_title = topic.text_content().strip()
-                logging.info(f"打开第 {idx + 1}/{len(topics)} 个主题 ：{article_title} ... ")
-                page = self.context.new_page()
-                article_url = HOME_URL + topic.get_attribute("href")
-                browsed_articles.append({"title": article_title, "url": article_url})
 
+                article_title = topic.text_content().strip()
+
+                article_url = HOME_URL + topic.get_attribute("href")
+
+                # 使用 Playwright 的方法来查找父元素
+                parent_element = topic.evaluate_handle(
+                    "(element) => element.closest('tr')"
+                )
+
+                # 使用 Playwright 的方法来查找元素
+                is_pinned = parent_element.query_selector_all(".topic-statuses .pinned")
+
+                if is_pinned:
+                    skip_articles.append({"title": article_title, "url": article_url})
+                    skip_count += 1
+                    logging.info(f"跳过置顶的帖子：{article_title}")
+                    continue
+
+                logging.info(f"打开第 {idx + 1}/{len(topics)} 个主题 ：{article_title} ... ")
+                
+                page = self.context.new_page()
+                
                 try:
+                    # 访问文章页面
                     page.goto(article_url)
-                    time.sleep(3)  # 等待页面完全加载
+                    # 访问文章数累加
+                    browsed_count += 1
+                    # 访问文章数信息记录
+                    browsed_articles.append({"title": article_title, "url": article_url})
+                    # 等待页面完全加载
+                    time.sleep(3)  
                     # 随机滚动页面
                     self.visit_article_and_scroll(page)
                     if random.random() < LIKE_PROBABILITY:
@@ -220,9 +249,17 @@ class LinuxDoBrowser:
                     page.close()
                     logging.info(f"已关闭第 {idx + 1}/{len(topics)} 个主题 ： {article_title} ...")
 
+            # 打印跳过的文章信息
+            logging.info(f"一共跳过了 {skip_count} 篇文章。")
+            if skip_count > 0:
+                logging.info("--------------跳过的文章信息-----------------")
+                logging.info("\n%s",tabulate(skip_articles, headers="keys", tablefmt="pretty"))
+
             # 打印浏览的文章信息
-            logging.info("--------------浏览的文章信息-----------------")
-            logging.info("\n%s",tabulate(browsed_articles, headers="keys", tablefmt="pretty"))
+            logging.info(f"一共浏览了 {browsed_count} 篇文章。")
+            if browsed_count > 0:
+                logging.info("--------------浏览的文章信息-----------------")
+                logging.info("\n%s",tabulate(browsed_articles, headers="keys", tablefmt="pretty"))
 
             # 打印点赞的文章信息
             logging.info(f"一共点赞了 {like_count} 篇文章。")
@@ -305,7 +342,7 @@ class LinuxDoBrowser:
                     requirement = cells[2].text_content().strip()
                     info.append([project, current, requirement])
 
-            logging.info("--------------Connect Info-----------------")
+            logging.info("--------------Connect Info 在过去 💯 天内-----------------")
             logging.info("\n%s", tabulate(info, headers=["项目", "当前", "要求"], tablefmt="pretty"))
         except TimeoutError:
             logging.error("连接信息页面加载超时")

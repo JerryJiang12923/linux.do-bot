@@ -5,9 +5,9 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 */6 * * *'  # 对应中国时间的每天凌晨3点
+    - cron: '5 10 * * 1-5'
   workflow_dispatch: # 允许手动触发
-
+  
 jobs:
   run-linuxdo:
     runs-on: ubuntu-latest

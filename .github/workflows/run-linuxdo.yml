@@ -6,6 +6,8 @@ on:
       - main
   schedule:
     - cron: '5 10 * * 1-5'
+  workflow_dispatch: # 允许手动触发
+  
 jobs:
   run-linuxdo:
     runs-on: ubuntu-latest

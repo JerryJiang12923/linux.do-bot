@@ -314,6 +314,7 @@ class LinuxDoBrowser:
                 content = (
                     f"<h1>Linux.do保活脚本 {end_time.strftime('%Y-%m-%d %H:%M:%S')}</h1>"
                     f"<br/><p style='color:red;'>"
+                    f"账号: {USERNAME}<br/>"
                     f"开始执行时间: {start_time.strftime('%Y-%m-%d %H:%M:%S')}<br/>"
                     f"结束执行时间: {end_time.strftime('%Y-%m-%d %H:%M:%S')}<br/>"
                     f"总耗时: {elapsed_time}<br/>"

@@ -4,7 +4,7 @@ permissions: write-all              # 授予写权限
 
 on: 
   schedule:
-    - cron: '0 */12 * * *'             # 每日中国时间凌晨2点触发
+    - cron: '0 */12 * * *'             # 每隔12个小时触发一次
   workflow_dispatch:                # 允许手动触发工作流
 
 jobs:

@@ -157,7 +157,7 @@ class LinuxDoBrowser:
             time.sleep(10)  # 等待页面加载完成
             user_ele = self.page.query_selector("#current-user")
             if not user_ele:
-                logging.error("登录失败")
+                logging.error("登录失败，请检查账号密码及是否关闭二次认证")
                 return False
             else:
                 logging.info("登录成功")

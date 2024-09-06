@@ -5,9 +5,9 @@ on:
     branches:
       - main
   schedule:
-    - cron: '0 */6 * * *'  # 每隔6个小时触发一次
+    - cron: '10 8 * * *'
   workflow_dispatch: # 允许手动触发
-
+  
 jobs:
   run-linuxdo:
     runs-on: ubuntu-latest

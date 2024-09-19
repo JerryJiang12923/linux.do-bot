@@ -1,7 +1,7 @@
 # 简介
-这个脚本用于自动化操作以保持 Linux.do 网站的活跃状态，包括浏览帖子并进行点赞，以及通过WxPusher推送消息到微信(可选)、自动回复帖子(可选)、自动加入书签(可选)。
+这个脚本用于自动化操作以保持 discuss论坛 网站的活跃状态，包括浏览帖子并进行点赞，以及通过WxPusher推送消息到微信(可选)、自动回复帖子(可选)、自动加入书签(可选)。
 
-下面是详细介绍如何在 Windows、Linux 服务器、GitHub Workflow 中配置并运行此 `Linux.do保活脚本` 的 Markdown 文档。
+下面是详细介绍如何在 Windows、Linux 服务器、GitHub Workflow 中配置并运行此 `discuss论坛保活脚本` 的 Markdown 文档。
 
 ---
 
@@ -15,11 +15,11 @@
 ---
 
 
-# Linux.do 保活脚本配置与运行指南
+# discuss论坛 保活脚本配置与运行指南
 
 ## 概述
 
-本指南将详细介绍如何在不同环境下（Windows、Linux 服务器、GitHub Workflow）配置并运行 `Linux.do保活脚本`。该脚本通过 Playwright 自动化操作对 `Linux.do` 网站的帖子进行浏览、点赞、加入书签和自动回复，并支持通过 WxPusher 发送通知。
+本指南将详细介绍如何在不同环境下（Windows、Linux 服务器、GitHub Workflow）配置并运行 `discuss论坛保活脚本`。该脚本通过 Playwright 自动化操作对 `discuss论坛` 网站的帖子进行浏览、点赞、加入书签和自动回复，并支持通过 WxPusher 发送通知。
 
 ## 项目目录结构
 
@@ -36,7 +36,7 @@
   - reply.txt
   - reply_generator.py
 - Docker/
-  - linux-do-bot.tar
+  - bot.tar
 - .dockerignore
 - .gitignore
 - Dockerfile
@@ -55,13 +55,13 @@
 
 ## 变量检查与说明
 
-- USERNAME: 登录 Linux.do 的用户名。
-- PASSWORD: 登录 Linux.do 的密码。
+- USERNAME: 登录 discuss论坛 的用户名。
+- PASSWORD: 登录 discuss论坛 的密码。
 - LIKE_PROBABILITY: 点赞概率，值在 0 和 1 之间，例如 0.02 表示 2% 的概率点赞。
 - REPLY_PROBABILITY: 回复概率，值在 0 和 1 之间，例如 0.02 表示 2% 的概率回复。
 - COLLECT_PROBABILITY: 加入书签概率，值在 0 和 1 之间，例如 0.02 表示 2% 的概率加入书签。
-- HOME_URL: Linux.do 的主页 URL，默认为 https://linux.do/。
-- CONNECT_URL: 连接信息页面的 URL，默认为 https://connect.linux.do/。
+- HOME_URL: discuss论坛 的主页 URL。
+- CONNECT_URL: 连接信息页面的 URL。
 - USE_WXPUSHER: 是否使用 wxpusher 发送消息通知，true 或 false。
 - APP_TOKEN: wxpusher 应用的 appToken，当 USE_WXPUSHER 为 true 时需要配置。
 - TOPIC_ID: wxpusher 的 topicId，当 USE_WXPUSHER 为 true 时需要配置。
@@ -94,8 +94,8 @@ collect_probability=0.02
 max_topics = 10
 
 [urls]
-home_url = https://linux.do/
-connect_url = https://connect.linux.do/
+home_url = 
+connect_url = 
 
 [wxpusher]
 use_wxpusher = false
@@ -138,8 +138,8 @@ collect_probability=0.02
 max_topics = 10
 
 [urls]
-home_url = https://linux.do/
-connect_url = https://connect.linux.do/
+home_url = 
+connect_url = 
 
 [wxpusher]
 use_wxpusher = true
@@ -194,7 +194,7 @@ python3 main.py
 在项目的 `.github/workflows/` 目录下创建一个新的 Workflow 文件 `run-linuxdo.yml`：
 
 ```yaml
-name: Run Linux.do Script
+name: Run bot Script
 
 on:
   push:
@@ -314,11 +314,11 @@ reply_path = resource_path("reply.txt")
 
 ### 5.1 . **构建 Docker 镜像 或者拉取镜像**：
 ```
-    docker build -t linux-do-bot .
+    docker build -t bot .
 ```
 OR：
 ```
-docker pull lee0692/linux-do-bot:latest
+docker pull lee0692/bot:latest
 ```
 
 ### 5.2. **更新包列表并安装依赖**:
@@ -351,7 +351,7 @@ sudo apt-get install -y --fix-missing \
 
 ### 5.3. **运行 Docker 容器**：
 ```
-    docker run -d --name linux-do-bot-container \
+    docker run -d --name bot-container \
       -e LINUXDO_USERNAME=your_username \
       -e LINUXDO_PASSWORD=your_password \
       -e LIKE_PROBABILITY=0.5 \
@@ -361,7 +361,7 @@ sudo apt-get install -y --fix-missing \
       -e USE_WXPUSHER=false \
       -e APP_TOKEN=your_app_token \
       -e TOPIC_ID=your_topic_id \
-      linux-do-bot
+      bot
 ```
 
    - 替换环境变量的值以匹配你的实际配置。
@@ -374,7 +374,7 @@ sudo apt-get install -y --fix-missing \
 services:
   app:
     build: .
-    container_name: linux-do-bot-container
+    container_name: bot-container
     environment:
       - LINUXDO_USERNAME=your_username
       - LINUXDO_PASSWORD=your_password
@@ -415,10 +415,10 @@ services:
 - WxPusher官册：https://wxpusher.zjiecode.com/ 查看官方手册
 
 ### 6.4 WxPusher 运行发送的消息是？
-- ![](https://github.com/LeeYouRan/linux.do-bot/blob/main/assets/wxPusher.png)
+- ![](https://github.com/LeeYouRan/bot/blob/main/assets/wxPusher.png)
 
-- ![](https://github.com/LeeYouRan/linux.do-bot/blob/main/assets/wxPusherMsg.png)
+- ![](https://github.com/LeeYouRan/bot/blob/main/assets/wxPusherMsg.png)
 
 ---
 
-按照以上指南配置并运行脚本后，您将能够在不同环境下自动浏览和点赞 `Linux.do` 的帖子，并根据配置接收通知。
+按照以上指南配置并运行脚本后，您将能够在不同环境下自动浏览和点赞 `discuss论坛` 的帖子，并根据配置接收通知。

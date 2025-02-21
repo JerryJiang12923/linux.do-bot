@@ -146,15 +146,16 @@ class LinuxDoBrowser:
 
     def login(self) -> bool:
         try:
+            time.sleep(10)
             logging.info("尝试登录...")
             self.page.click(".login-button .d-button-label")
-            time.sleep(2)
+            time.sleep(3)
             self.page.fill("#login-account-name", USERNAME)
-            time.sleep(2)
+            time.sleep(3)
             self.page.fill("#login-account-password", PASSWORD)
-            time.sleep(2)
+            time.sleep(3)
             self.page.click("#login-button")
-            time.sleep(20)  # 等待页面加载完成
+            time.sleep(15)  # 等待页面加载完成
             user_ele = self.page.query_selector("#current-user")
             if not user_ele:
                 logging.error("登录失败，请检查账号密码及是否关闭二次认证")

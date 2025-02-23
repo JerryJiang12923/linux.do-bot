@@ -62,6 +62,11 @@ jobs:
         ./sing-box run -c config.json > /dev/null 2>&1 &
         sleep 5  # 等待服务初始化
 
+    - name: 设置全局代理环境变量
+      run: |
+        echo "HTTP_PROXY=socks5://127.0.0.1:1080" >> $GITHUB_ENV
+        echo "HTTPS_PROXY=socks5://127.0.0.1:1080" >> $GITHUB_ENV
+        echo "NO_PROXY=localhost,127.0.0.1,::1" >> $GITHUB_ENV  # 排除本地地址
 
     - name: Run script
       env:

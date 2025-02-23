@@ -25,6 +25,8 @@ jobs:
       run: |
         pip install playwright requests tabulate configparser
         playwright install
+        pip install pysocks
+        sudo apt-get install -y libsocks5-dev libcurl4-openssl-dev
 
     - name: 下载 Sing-Box
       run: |

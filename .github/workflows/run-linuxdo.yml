@@ -26,6 +26,24 @@ jobs:
         pip install playwright requests tabulate configparser
         playwright install
 
+    - name: 安装Shadowsocks客户端
+      run: pip install shadowsocks
+
+    - name: 启动Shadowsocks（通过Secrets配置）
+      env:
+        SS_SERVER: ${{ secrets.SS_SERVER }}
+        SS_PORT: ${{ secrets.SS_PORT }}
+        SS_PASSWORD: ${{ secrets.SS_PASSWORD }}
+        SS_METHOD: ${{ secrets.SS_METHOD }}
+      run: |
+        sslocal -s $SS_SERVER -p $SS_PORT -k $SS_PASSWORD -m $SS_METHOD -l 1080 -d
+
+    - name: 设置代理环境变量
+      run: |
+        echo "HTTP_PROXY=socks5://127.0.0.1:1080" >> $GITHUB_ENV
+        echo "HTTPS_PROXY=socks5://127.0.0.1:1080" >> $GITHUB_ENV
+
+
     - name: Run script
       env:
         TZ: Asia/Shanghai  # 设置时区为中国时区

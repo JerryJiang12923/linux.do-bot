@@ -125,7 +125,12 @@ class LinuxDoBrowser:
         logging.info("启动 Playwright...")
         self.pw = sync_playwright().start()
         logging.info("以无头模式启动 Firefox...")
-        self.browser = self.pw.firefox.launch(headless=True)
+        self.browser = self.pw.firefox.launch(
+            headless=True,
+            proxy={
+            "server": "socks5://127.0.0.1:1080"
+            }
+        )
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
         logging.info(f"导航到 {HOME_URL}...")

@@ -131,11 +131,11 @@ class LinuxDoBrowser:
             "server": "socks5://127.0.0.1:1080"
             }
         )
+        self.check_proxy()
         self.context = self.browser.new_context()
         self.page = self.context.new_page()
         logging.info(f"导航到 {HOME_URL}...")
         self.page.goto(HOME_URL)
-        self.check_proxy()
         logging.info("初始化完成。")
 
 

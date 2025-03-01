@@ -135,8 +135,22 @@ class LinuxDoBrowser:
         self.page = self.context.new_page()
         logging.info(f"导航到 {HOME_URL}...")
         self.page.goto(HOME_URL)
+        self.check_proxy()
         logging.info("初始化完成。")
 
+
+    def check_proxy(self):
+        try:
+            test_page = self.context.new_page()
+            # 访问 IP 检测网站
+            test_page.goto("https://api.ipify.org", timeout=30000)
+            ip = test_page.content()
+            logging.info(f"代理生效！当前出口 IP: {ip}")
+            test_page.close()
+        except Exception as e:
+            logging.error(f"代理检查失败: {e}")
+            raise RuntimeError("代理服务不可用")
+        
     def load_messages(self, filename):
         """从指定的文件加载消息并返回消息列表。"""
         script_dir = os.path.dirname(os.path.abspath(__file__))

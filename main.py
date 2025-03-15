@@ -157,7 +157,6 @@ class LinuxDoBrowser:
             time.sleep(5)
             self.page.keyboard.press('F5',delay=100)
             self.page.reload()
-            self.page.click(".login-button .d-button-label")
             time.sleep(2)
             self.page.fill("#login-account-name", USERNAME)
             time.sleep(2)

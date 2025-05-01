@@ -154,15 +154,6 @@ class LinuxDoBrowser:
             self.page.fill("#login-account-password", PASSWORD)
             time.sleep(2)
             self.page.click("#login-button")
-            time.sleep(5)
-            self.page.keyboard.press('F5',delay=100)
-            self.page.reload()
-            time.sleep(2)
-            self.page.fill("#login-account-name", USERNAME)
-            time.sleep(2)
-            self.page.fill("#login-account-password", PASSWORD)
-            time.sleep(2)
-            self.page.click("#login-button")
             time.sleep(10)  # 等待页面加载完成
             user_ele = self.page.query_selector("#current-user")
             if not user_ele:
